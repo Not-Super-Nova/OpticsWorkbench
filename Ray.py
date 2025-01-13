@@ -14,6 +14,7 @@ import traceback
 from wavelength_to_rgb.gentable import wavelen2rgb
 import OpticalObject
 import FreeCADGui
+import cProfile
 
 import FreeCAD
 translate = FreeCAD.Qt.translate
@@ -242,11 +243,10 @@ class RayWorker:
         
 
     def makeInitialRay(self, fp, posdirarray):
+        pr = cProfile.Profile()
+        pr.enable()
         pl = fp.Placement
         linearray = []
-        
-        raysToTrace = []
-
 
         for (pos, dir) in posdirarray:
             ppos = pos + pl.Base
@@ -260,17 +260,14 @@ class RayWorker:
                 self.lastRefIdx = []
     
                 try:
-                    #self.traceRay(fp, linearray, True)
-                    raysToTrace.append([fp, linearray, True])
+                    self.traceRay(fp, linearray, True)
                 except Exception as ex:
                     print(ex)
                     traceback.print_exc()
             else:
                 linearray.append(Part.makeLine(ppos, ppos + pdir))
-        
-        for ray in raysToTrace:
-            self.traceRay(ray[0], ray[1], ray[2])
-
+        pr.disable()
+        pr.dump_stats("C:/temp/makeInitialRay.cprof")
         return linearray
 
 
