@@ -273,6 +273,8 @@ class RayWorker:
 
     def getIntersections(self, fp, line):
         '''returns [(OpticalObject, [(edge/face, intersection point)] )]'''
+        pr = cProfile.Profile()
+        pr.enable()
         isec_struct = []
         origin = PointVec(line.Vertexes[0])
 
@@ -315,6 +317,8 @@ class RayWorker:
                 if len(isec_parts) > 0:
                     isec_struct.append((optobj, isec_parts))
 
+        pr.disable()
+        pr.dump_stats("C:/temp/getIntersections.cprof")
         return isec_struct
 
 
