@@ -244,9 +244,14 @@ class RayWorker:
     def makeInitialRay(self, fp, posdirarray):
         pl = fp.Placement
         linearray = []
+        
+        raysToTrace = []
+
+
         for (pos, dir) in posdirarray:
             ppos = pos + pl.Base
             pdir = pl.Rotation.multVec(dir)
+
             if fp.Power == True:
                 self.iter = fp.MaxNrReflections
                 ray = Part.makeLine(ppos, ppos + pdir * fp.MaxRayLength / pdir.Length)
@@ -255,13 +260,17 @@ class RayWorker:
                 self.lastRefIdx = []
     
                 try:
-                    self.traceRay(fp, linearray, True)
+                    #self.traceRay(fp, linearray, True)
+                    raysToTrace.append([fp, linearray, True])
                 except Exception as ex:
                     print(ex)
                     traceback.print_exc()
             else:
                 linearray.append(Part.makeLine(ppos, ppos + pdir))
-                
+        
+        for ray in raysToTrace:
+            self.traceRay(ray[0], ray[1], ray[2])
+
         return linearray
 
 
